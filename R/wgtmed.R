@@ -18,6 +18,10 @@
 #' @param y_outcome 
 #'   The (character) name of the outcome variable, y. If this is not provided, then
 #'   no effects will be calculated and a warning will be raised. Default : `NULL`.
+#' @param med_interact
+#'   The (character) vector of names of variables specified on the right-hand side 
+#'   of formula.med that consist of crossproducts or interactions between a covariate
+#'    and the mediator. See the tutorial for details on these variables.
 #' @param total_effect_wts 
 #'   A vector of total effect weights, which if left `NULL`
 #'   then total_effect_ps must be supplied. Default : `NULL`.
@@ -149,6 +153,7 @@ wgtmed <- function(formula.med,
                       data,
                       a_treatment,
                       y_outcome = NULL,
+                      med_interact = NULL,
                       total_effect_wts = NULL,
                       total_effect_ps = NULL,
                       total_effect_stop_rule = NULL,
@@ -179,7 +184,7 @@ wgtmed <- function(formula.med,
         }
         
         # Check class of total_effect_ps is a ps object
-        if(!is.null(total_effect_ps) & class(total_effect_ps)!="ps") stop("total_effect_ps must be a ps object")
+        if(!is.null(total_effect_ps) & inherits(total_effect_ps,"ps")==FALSE) stop("total_effect_ps must be a ps object")
         
         # Check the specification of total effect weights 
         # Set total_effect_covars to NULL and set to value later if possible
@@ -246,10 +251,21 @@ wgtmed <- function(formula.med,
                 if(y_outcome %in% var.names.med){stop("The outcome variables equals a covariate")}
                 if(!(y_outcome %in% names(data))){stop("The outcome variable is not in the dataset")}
         }
-        
+  
+        #* The variables in med_interact must be in the covariates specified in formula.med
+        if(!is.null(med_interact)){
+            if(!all(med_interact %in% var.names.med)){stop("The variables in med_interact must be in the covariates specified in formula.med")}
+        }
+          
         # Create formula for tx without mediator
         #* Model to weights for total effect
-        form <- as.formula(paste(a_treatment, "~", paste(var.names.med, collapse="+"))) 
+        #* Remove any interaction terms that include the mediator
+        if(is.null(med_interact)){
+             var.names.med.tmp <- var.names.med
+        }else{
+             var.names.med.tmp <- var.names.med[-match(med_interact, var.names.med)]
+        }
+        form <- as.formula(paste(a_treatment, "~", paste(var.names.med.tmp, collapse="+"))) 
         
         check_missing(data[,a_treatment])
         check_missing(data[,m_mediators])
@@ -412,13 +428,14 @@ wgtmed <- function(formula.med,
         }
         results <- list(method=method, model_m0 = model_m0_res, model_m1 = model_m1_res, 
                         model_a = model_a_res, mediator_names = m_mediators, covariate_names = var.names.med, 
-                        a_treatment=a_treatment, y_outcome=y_outcome, 
+                        med_interactions=med_interact,a_treatment=a_treatment, y_outcome=y_outcome, 
                         stopping_methods = ps_stop.method, data = data, datestamp = date())
         class(results) <- "mediation"
         attr(results, "w_11") <- w_11
         attr(results, "w_00") <- w_00
         attr(results, "w_10") <- w_10
         attr(results, "w_01") <- w_01
+        attr(results, "sampw") <- sampw
         if (is.null(y_outcome)) {
                 return(results)
         }
@@ -448,8 +465,8 @@ wgtmed <- function(formula.med,
         wts_TE <- w_11[,1]
         wts_TE[ctrlgrp] <- w_00[ctrlgrp,1]
         dx.wts_TE <- dx.wts.mediation(wts_TE, data = data, 
-                                      vars = var.names.med, treat.var = a_treatment, x.as.weights = TRUE, 
-                                      estimand = "ATE")
+                                      vars = var.names.med.tmp, treat.var = a_treatment, x.as.weights = TRUE, 
+                                      estimand = "ATE",sampw=sampw)
         
         
         ## NIE1 
@@ -459,7 +476,7 @@ wgtmed <- function(formula.med,
         dtmp <- rbind(data.frame(data[txgrp,], txtmp=1), data.frame(data[txgrp,], txtmp=0))
         dx.wts_NIE1 <- dx.wts.mediation(wts_NIE1, data = dtmp, 
                                         vars = var.names.med, treat.var = "txtmp", x.as.weights = TRUE, 
-                                        estimand = "ATE")
+                                        estimand = "ATE",sampw=c(sampw[txgrp],sampw[txgrp]))
         
         ## NDE0 
         wts_NDE0 <- w_10
@@ -468,7 +485,7 @@ wgtmed <- function(formula.med,
                 colnames(wts_NDE0) <- method}
         dx.wts_NDE0 <- dx.wts.mediation(wts_NDE0, data = data, 
                                         vars = var.names.med, treat.var = a_treatment, x.as.weights = TRUE, 
-                                        estimand = "ATE")
+                                        estimand = "ATE",sampw=sampw)
         
         ## NIE0 
         wts_NIE0 <- rbind(as.matrix(w_01[ctrlgrp,]), as.matrix(w_00[ctrlgrp,]))
@@ -477,7 +494,7 @@ wgtmed <- function(formula.med,
         dtmp <- rbind(data.frame(data[ctrlgrp,], txtmp=1), data.frame(data[ctrlgrp,], txtmp=0))
         dx.wts_NIE0 <- dx.wts.mediation(wts_NIE0, data = dtmp, 
                                         vars = var.names.med, treat.var = "txtmp", x.as.weights = TRUE, 
-                                        estimand = "ATE")
+                                        estimand = "ATE",sampw=c(sampw[ctrlgrp],sampw[ctrlgrp]))
         
         ## NDE1 
         wts_NDE1 <- w_11
@@ -486,7 +503,7 @@ wgtmed <- function(formula.med,
                 colnames(wts_NDE1) <- method}
         dx.wts_NDE1 <- dx.wts.mediation(wts_NDE1, data = data, 
                                         vars = var.names.med, treat.var = a_treatment, x.as.weights = TRUE, 
-                                        estimand = "ATE")
+                                        estimand = "ATE",sampw=sampw)
         ## NIE1 Mediators
         wts_NIE1_m <- w_00
         wts_NIE1_m[txgrp,] <- w_10[txgrp,]
@@ -494,7 +511,7 @@ wgtmed <- function(formula.med,
                 colnames(wts_NIE1_m) <- method}
         dx.wts_NIE1_m <- dx.wts.mediation(wts_NIE1_m, data = data, 
                                           vars = m_mediators, treat.var = a_treatment, x.as.weights = TRUE, 
-                                          estimand = "ATE")
+                                          estimand = "ATE",sampw=sampw)
         
         ## NIE0 Mediators
         wts_NIE0_m <- w_01
@@ -503,7 +520,7 @@ wgtmed <- function(formula.med,
                 colnames(wts_NIE0_m) <- method}
         dx.wts_NIE0_m <- dx.wts.mediation(wts_NIE0_m, data = data, 
                                           vars = m_mediators, treat.var = a_treatment, x.as.weights = TRUE, 
-                                          estimand = "ATE")
+                                          estimand = "ATE",sampw=sampw)
         
         results[["dx.wts"]] <- list(TE=dx.wts_TE, NIE1=dx.wts_NIE1, NDE0=dx.wts_NDE0, 
                                     NIE0=dx.wts_NIE0, NDE1=dx.wts_NDE1, 

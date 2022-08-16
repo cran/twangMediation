@@ -3,5 +3,5 @@
 %\VignetteIndexEntry{A tutorial for conducting causal mediation analysis with the twangMediation package}
 
 \begin{document}
-\includepdf[pages=-, fitpaper=true]{twangMediation.pdf}
+\includepdf[pages=-, fitpaper=true]{twangMediation_tutorial.pdf}
 \end{document}

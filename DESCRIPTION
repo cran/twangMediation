@@ -1,6 +1,6 @@
 Package: twangMediation
 Title: Twang Causal Mediation Modeling via Weighting
-Version: 1.1
+Version: 1.2
 Authors@R: 
     c(person(given = "Dan",
            family = "McCaffrey",
@@ -37,13 +37,13 @@ Description: Provides functions for estimating natural direct and indirect effec
 Depends: R (>= 2.10)
 Imports: twang, gbm (>= 1.5-3), graphics, stats, lattice, latticeExtra,
         survey
-Suggests: knitr
+Suggests: knitr, xgboost
 VignetteBuilder: knitr
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 LazyData: true
 NeedsCompilation: no
-Packaged: 2021-12-07 22:06:34 UTC; tophey
+Packaged: 2022-08-11 20:59:47 UTC; tophey
 Repository: CRAN
-Date/Publication: 2021-12-13 14:40:02 UTC
+Date/Publication: 2022-08-16 11:50:02 UTC

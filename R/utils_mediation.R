@@ -1,4 +1,4 @@
-#' Calculate a weighted mean.
+#' Calculate a weighted mean
 #'
 #' `weighted_mean` calculates a weighted mean, given a vector.
 #'
@@ -24,9 +24,9 @@ weighted_mean <- function(x, weights, multiplier = NULL, na.rm = TRUE) {
   return(sum(x * multiplier * weights, na.rm = na.rm) / sum(multiplier * weights, na.rm = na.rm))
 }
 
-#' Check vector for NA or NAN values.
+#' Check vector for NA or NAN values
 #'
-#' `check_missing` raises and error if the data contains.
+#' `check_missing` raises an error if the data contains
 #' NA or NAN values.
 #'
 #' @param x numeric

@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.mediation.R
 \name{summary.mediation}
 \alias{summary.mediation}
-\title{Displays a useful description of a \code{mediation} object.}
+\title{Displays a useful description of a \code{mediation} object}
 \usage{
 \method{summary}{mediation}(object, ...)
 }
@@ -17,7 +17,7 @@
 \item{mediator_distribution_check}{balance tables for NIE_1 and NIE_0}
 }
 \description{
-Displays a useful description of a \code{mediation} object.
+Displays a useful description of a \code{mediation} object
 }
 \examples{
 data("tMdat")

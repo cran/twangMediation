@@ -1,4 +1,4 @@
-#' Compute diagnostics assessing covariates balance.
+#' Compute diagnostics assessing covariates balance
 #'
 #' `dx.wts.mediation` takes a `ps` object or a set of propensity scores and 
 #' computes diagnostics assessing covariates balance.
@@ -20,7 +20,7 @@
 #'   specifies propensity score weights or propensity scores. 
 #'   Ignored if `x` is a ps object. Default: `TRUE`.
 #' @param sampw Optional sampling weights. If `x` is a `ps` object, then the 
-#'   sampling weights should have been passed to [ps] and 
+#'   sampling weights should have been passed to \link[twang]{ps} and 
 #'   not specified here. `dx.wts.mediation` will issue a warning if 
 #'   `x` is a ps object and `sampw` is also specified.
 #' @param perm.test.iters A non-negative integer giving the number of iterations
@@ -126,10 +126,10 @@ dx.wts.mediation <- function(x,
       treat.var <- x$treat.var
       estimand <- x$estimand
    }
-   #if(!all(w[,1]==1)) {
+   if(!all(w[,1]==1)) {
       w   <- cbind(unw=rep(1,nrow(w)),w)
       p.s <- cbind(unw=rep(0.5,nrow(p.s)),p.s)
-   #}
+   }
    if(!is.null(sampw)) w <- w*sampw
    if(is.null(vars)) vars <- names(data)[names(data) != treat.var]
 

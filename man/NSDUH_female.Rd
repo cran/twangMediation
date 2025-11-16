@@ -5,7 +5,7 @@
 \alias{NSDUH_female}
 \title{A dataset containing the substance use condition and sexual orientation
 of 40293 women respondents to the 2017 & 2018 National Survey of Drug Use
-and Health.}
+and Health}
 \format{
 A data frame with 40293 rows and 24 variables:
 \describe{
@@ -44,7 +44,7 @@ NSDUH_female
 \description{
 A dataset containing the substance use condition and sexual orientation
 of 40293 women respondents to the 2017 & 2018 National Survey of Drug Use
-and Health.
+and Health
 }
 \examples{
 \dontrun{

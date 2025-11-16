@@ -2,7 +2,7 @@
 #'
 #' A dataset containing the substance use condition and sexual orientation 
 #' of 40293 women respondents to the 2017 & 2018 National Survey of Drug Use 
-#' and Health.
+#' and Health
 #'
 #' @format A data frame with 40293 rows and 24 variables:
 #' \describe{
@@ -42,7 +42,7 @@
 #' Simulated data for twangMediation
 #'
 #' A simulate dataset for demonstrating the functions in the twangMediation 
-#' package.
+#' package
 #'
 #' @format A data frame with 500 rows and 7 variables:
 #' \describe{

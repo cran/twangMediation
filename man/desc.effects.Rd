@@ -13,7 +13,7 @@ desc.effects(x, ...)
 Additional arguments.}
 }
 \value{
-{Effects, standard errors and confidence intervals of an object}
+Effects, standard errors and confidence intervals of an object
 }
 \description{
 Describe the effects, and calculate standard

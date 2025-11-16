@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_mediation.R
 \name{check_missing}
 \alias{check_missing}
-\title{Check vector for NA or NAN values.}
+\title{Check vector for NA or NAN values}
 \usage{
 check_missing(x)
 }
@@ -14,6 +14,6 @@ The data set to check for NA or NAN values.}
 Indicator of the existence of NA or NAN values
 }
 \description{
-\code{check_missing} raises and error if the data contains.
+\code{check_missing} raises an error if the data contains
 NA or NAN values.
 }

@@ -6,7 +6,7 @@
 #' @param x An object
 #' @param ... list, optional
 #'   Additional arguments.
-#' @return {Effects, standard errors and confidence intervals of an object}
+#' @return Effects, standard errors and confidence intervals of an object
 #' @examples 
 #' data("tMdat")
 #' 

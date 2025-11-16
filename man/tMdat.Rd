@@ -24,7 +24,7 @@ tMdat
 }
 \description{
 A simulate dataset for demonstrating the functions in the twangMediation
-package.
+package
 }
 \examples{
 \dontrun{

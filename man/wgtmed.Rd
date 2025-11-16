@@ -2,14 +2,13 @@
 % Please edit documentation in R/wgtmed.R
 \name{wgtmed}
 \alias{wgtmed}
-\title{Weighted mediation analysis.}
+\title{Weighted mediation analysis}
 \usage{
 wgtmed(
   formula.med,
   data,
   a_treatment,
   y_outcome = NULL,
-  med_interact = NULL,
   total_effect_wts = NULL,
   total_effect_ps = NULL,
   total_effect_stop_rule = NULL,
@@ -43,10 +42,6 @@ dichotomous (0, 1).}
 \item{y_outcome}{The (character) name of the outcome variable, y. If this is not provided, then
 no effects will be calculated and a warning will be raised. Default : \code{NULL}.}
 
-\item{med_interact}{The (character) vector of names of variables specified on the right-hand side
-of formula.med that consist of crossproducts or interactions between a covariate
-and the mediator. See the tutorial for details on these variables.}
-
 \item{total_effect_wts}{A vector of total effect weights, which if left \code{NULL}
 then total_effect_ps must be supplied. Default : \code{NULL}.}
 
@@ -59,21 +54,21 @@ only needs to be specified if total_effect_ps is provided. Default : \code{NULL}
 
 \item{sampw}{Optional sampling weights Default : \code{NULL}.}
 
-\item{ps_n.trees}{Number of gbm iterations passed on to \link{gbm}. Default: 10000.}
+\item{ps_n.trees}{Number of gbm iterations passed on to \link[gbm]{gbm}. Default: 10000.}
 
 \item{ps_interaction.depth}{A positive integer denoting the tree depth used in
 gradient boosting. Default: 3.}
 
 \item{ps_shrinkage}{A numeric value between 0 and 1 denoting the learning rate.
-See \link{gbm} for more details. Default: 0.01.}
+See \link[gbm]{gbm} for more details. Default: 0.01.}
 
 \item{ps_bag.fraction}{A numeric value between 0 and 1 denoting the fraction of
 the observations randomly selected in each iteration of the gradient
-boosting algorithm to propose the next tree. See \link{gbm} for
+boosting algorithm to propose the next tree. See \link[gbm]{gbm} for
 more details. Default: 1.0.}
 
 \item{ps_n.minobsinnode}{An integer specifying the minimum number of observations
-in the terminal nodes of the trees used in the gradient boosting.  See \link{gbm} for
+in the terminal nodes of the trees used in the gradient boosting.  See \link[gbm]{gbm} for
 more details. Default: 10.}
 
 \item{ps_perm.test.iters}{A non-negative integer giving the number of iterations
@@ -146,10 +141,6 @@ The \code{mediation} object includes the following:
 \item \code{expected_treatment1_mediator0} E(Y(1, M(0)))
 \item \code{expected_treatment0_mediator1} E(Y(0, M(1)))
 }
-\item \code{dx.wts} A list with information for checking covariate balance of for each
-estimated effect. Elements are TE, NIE1, NDE0, NIE0, NDE1, with results of
-\code{twang} \code{dx.wts} for the covariates when weighted  by weights used in the
-estimating the effect.
 }
 }
 \description{
@@ -157,9 +148,9 @@ Estimate causal mediation mechanism of a treatment
 using propensity score weighting.
 }
 \details{
-For users comfortable with \link{ps}, any options prefaced with
+For users comfortable with \link[twang]{ps}, any options prefaced with
 \code{ps_} are passed directly to the \code{ps()} function.
-Model A is used to estimate Pr(A=1 | X) where X is the vector of background covariates specified in \code{formula.med}. If \code{method} equals \code{"ps"} model A is fit using the \link{twang} \code{ps} function with estimand= \code{"ATE"}. If \code{method} equals \code{"logistic"} then model A is fit using logistic regression. If \code{method} equals \code{"crossval"} then \link{gbm} using cross-validation is used to estimate model A. Because X might include variables not used to estimate the user-provided total effect weights, model A is fit rather than using the user-provided total effect weights to derive Pr(A | X). If the user uses the same set of variables to estimate their provided total effect weights as they enter in the wgtmed function to estimate the cross-world weights and the user uses the same estimation method and arguments as specified in the wgtmed function, then the estimated model A will match the model the user used to obtain the provided total effect weights.
+Model A is used to estimate Pr(A=1 | X) where X is the vector of background covariates specified in \code{formula.med}. If \code{method} equals \code{"ps"} model A is fit using the \link[twang]{twang} \code{ps} function with estimand= \code{"ATE"}. If \code{method} equals \code{"logistic"} then model A is fit using logistic regression. If \code{method} equals \code{"crossval"} then \link[gbm]{gbm} using cross-validation is used to estimate model A. Because X might include variables not used to estimate the user-provided total effect weights, model A is fit rather than using the user-provided total effect weights to derive Pr(A | X). If the user uses the same set of variables to estimate their provided total effect weights as they enter in the wgtmed function to estimate the cross-world weights and the user uses the same estimation method and arguments as specified in the wgtmed function, then the estimated model A will match the model the user used to obtain the provided total effect weights.
 }
 \examples{
 data("tMdat")

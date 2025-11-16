@@ -33,96 +33,68 @@ print.mediation <- function(x, ...)
   } else {
     estimates_table <- NULL
   }
-  print(list(estimates_table = estimates_table))
-  
-  ps_tables  <- lapply(x$dx.wts, function(x){tmp <- x$summary.tab
-  tmp$iter <- NULL
-  rownames(tmp) <- tmp$type
-  tmp$type <- NULL
-  return(tmp)})
-  
-  # add the row name for the 2nd row in total effect ps_tables
-  rownames(ps_tables[[1]])[2] <- x$method
 
-  ###### Add weight-related notes####
-  
-  if(!is.null(attr(x,"sampw"))) {
-        methodnms <- rownames(ps_tables$NIE1[-1,])
-        if(length(methodnms)==1) { 
-		methods <- paste0("\"",methodnms,"\" reflects")
-	} 
-	if(length(methodnms)==2) {
-		methods <- character()
-        	for(i in methodnms) {
-        		methods <- c(methods,paste0("\"",i,"\""))
-		}
-		methods <- paste(paste(methods,collapse=" and "),"relfect")
-	}
-	if(length(methodnms)>2) {
-		methods <- character()
-        	for(i in methodnms[1:(length(methodnms)-1)]) {
-        		methods <- c(methods,paste0("\"",i,"\""))
-		}
-		methods <- paste0(paste(methods,collapse=", "),", and \"",methodnms[length(methodnms)],"\" reflect")
-	}
-  }
-  for (i in 1:5){
-    if(names(ps_tables)[[i]]=="TE") {
-      if(!is.null(attr(x,"sampw"))) {
-        cat(paste0("Note: Balance for Covariates for Total Effects -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" control group weighted by w00 weights \n \"unw\" reflects weighting with sampling weights only \n \"",rownames(ps_tables[["TE"]])[2],"\" reflects weighting by both the sampling weights and total-effect weights \n"))
-      } else {
-        cat("Note: Balance for Covariates for Total Effects -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" control group weighted by w00 weights \n")
+  # Get summaries of ps xs
+    if(x$method=="ps") {
+      model_a  <- summary(x$model_a)
+      model_m0 <- summary(x$model_m0)
+      model_m1 <- summary(x$model_m1)
+    } 
+    if(x$method!="ps") {
+      data <- x$data 
+
+      if(x$method=="logistic") {
+        model_a_preds <- predict(x$model_a,type="response")
+      } else {     
+        best.iter <- gbm::gbm.perf(x$model_a, method="cv",plot.it=FALSE)
+        model_a_preds <- predict(x$model_a, n.trees=best.iter, newdata=data, type="response")
       }
-    }else{ps_tables[[i]]<- ps_tables[[i]][-1,] # delete the "unw" rows
-    }
-    if(names(ps_tables)[[i]]=="NIE1") {
-      if(!is.null(attr(x,"sampw"))) {
-        cat("Note: Balance for Covariates for NIE1 -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" treatment group weighted by w10 weights \n Results reflect weighting by both the sampling weights and total-effect/cross-world weights \n")
-      } else {
-        cat("Note: Balance for Covariates for NIE1 -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" treatment group weighted by w10 weights \n")
+
+      wts_a <- ifelse(data[,x$a_treatment]==1,1/model_a_preds,1/(1-model_a_preds))
+      dx_a <- dx.wts.mediation(wts_a, data = data, 
+          vars = x$covariate_names, treat.var = x$a_treatment, x.as.weights = TRUE, 
+          estimand = "ATE")      
+      dx_a$desc[[1]]["iter"] <- NA
+      dx_a$desc[[2]]["iter"] <- NA
+      names(dx_a$desc)[2] <- x$method
+      model_a <- summary(dx_a)
+
+      data$trt0 <- 1-data[,x$a_treatment]
+      if(x$method=="logistic") {
+        model_m_preds <- predict(x$model_m0,type="link")
+      }      
+        else {
+        best.iter <- gbm::gbm.perf(x$model_m0, method="cv",plot.it=FALSE)
+        model_m_preds <- predict(x$model_m0, n.trees=best.iter, newdata=data, type="link")
       }
+      wts_m0 <- ifelse(data[,x$a_treatment]==0,1,1/exp(model_m_preds))
+      dx_m0 <- dx.wts.mediation(wts_m0, data = data, 
+          vars = c(x$mediator_names,x$covariate_names), treat.var = "trt0", x.as.weights = TRUE, 
+          estimand = "ATT")
+      dx_m0$desc[[1]]["iter"] <- NA
+      dx_m0$desc[[2]]["iter"] <- NA
+      names(dx_m0$desc)[2] <- x$method
+      dx_m0$desc$unw <- swapTxCtrl(dx_m0$desc$unw)
+      dx_m0$desc[[x$method]] <- swapTxCtrl(dx_m0$desc[[x$method]])
+      model_m0 <- summary(dx_m0)
+
+      wts_m1 <- ifelse(data[,x$a_treatment]==0,exp(model_m_preds),1)
+      dx_m1 <- dx.wts.mediation(wts_m1, data = data, 
+        vars =  c(x$mediator_names,x$covariate_names), treat.var = x$a_treatment, x.as.weights = TRUE, 
+        estimand = "ATT")
+      dx_m1$desc[[1]]["iter"] <- NA
+      dx_m1$desc[[2]]["iter"] <- NA
+      names(dx_m1$desc)[2] <- x$method
+      model_m1 <- summary(dx_m1)
     }
-    if(names(ps_tables)[[i]]=="NDE0") {
-      if(!is.null(attr(x,"sampw"))) {
-        cat("Note: Balance for Covariates for NDE0 -- \n \"treat\" treatment group weighted by w10 weights, \n \"ctrl\" control group weighted by w00 weights \n Results reflect weighting by both the sampling weights and total-effect/cross-world weights \n")
-      } else {
-        cat("Note: Balance for Covariates for NDE0 -- \n \"treat\" treatment group weighted by w10 weights, \n \"ctrl\" control group weighted by w00 weights \n")
-      }
-    }
-    if(names(ps_tables)[[i]]=="NIE0") {
-      if(!is.null(attr(x,"sampw"))) {
-        cat("Note: Balance for Covariates for NIE0 -- \n \"treat\" control group weighted by w01 weights, \n \"ctrl\" control group weighted by w00 weights \n Results reflect weighting by both the sampling weights and total-effect/cross-world weights \n")
-      } else {
-        cat("Note: Balance for Covariates for NIE0 -- \n \"treat\" control group weighted by w01 weights, \n \"ctrl\" control group weighted by w00 weights \n")
-      }
-    }
-    if(names(ps_tables)[[i]]=="NDE1") {
-      if(!is.null(attr(x,"sampw"))) {
-        cat("Note: Balance for Covariates for NDE1 -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" control group weighted by w01 weights \n Results reflect weighting by both the sampling weights and total-effect/cross-world weights \n")
-      } else {
-        cat("Note: Balance for Covariates for NDE1 -- \n \"treat\" treatment group weighted by w11 weights, \n \"ctrl\" control group weighted by w01 weights \n")
-      }
-    }
-    cat(paste(paste(rep('-', 90), collapse = ''), '\n', sep=''))
-    print(round(ps_tables[[i]],digits=3))
-    cat(paste(paste(rep('-', 90), collapse = ''), '\n', sep=''))
-  }
-  ##### End of code for weight-related notes##  
-  
+
+    ps_tables  <- list(model_a=model_a,model_m0=model_m0,model_m1=model_m1)
+
   # Get balance tables for NIE_1 and NIE_0
   # to check that weights for the counterfactual 
   # mediator distributions yeild distributions of 
   # mediators that match the target
   mediator_distribution_check <- bal.table.mediation(x)[c("check_counterfactual_nie_1","check_counterfactual_nie_0")]
-  
-##  print(list(mediator_distribution = mediator_distribution_check))
-    for(i in c("check_counterfactual_nie_1","check_counterfactual_nie_0")) {
-       cat(paste("Mediator Distribution Check:",i,"\n"))
-       if(!is.null(attr(x,"sampw"))) {
-	  cat(paste0("\"unw\" reflects weighting with sampling weights only \n",methods," weighting by both the sampling weights and total-effect/cross-world weights \n"))
-	}
-        cat(paste(paste(rep('-', 90), collapse = ''), '\n', sep=''))
-        print(round(mediator_distribution_check[[i]], digits=3))
-        cat(paste(paste(rep('-', 90), collapse = ''), '\n', sep=''))
-    }
+
+  print(list(estimates_table = estimates_table, ps_summary_tables = ps_tables, mediator_distribution = mediator_distribution_check))
 }

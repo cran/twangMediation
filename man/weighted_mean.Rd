@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_mediation.R
 \name{weighted_mean}
 \alias{weighted_mean}
-\title{Calculate a weighted mean.}
+\title{Calculate a weighted mean}
 \usage{
 weighted_mean(x, weights, multiplier = NULL, na.rm = TRUE)
 }

@@ -2,22 +2,14 @@
 % Please edit documentation in R/bal.table.mediation.R
 \name{bal.table.mediation}
 \alias{bal.table.mediation}
-\title{Compute the balance table for mediation object.}
+\title{Compute the balance table for mediation object}
 \usage{
-bal.table.mediation(x, digits = 3, details = FALSE, plot = FALSE, ...)
+bal.table.mediation(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{A \code{mediation} object}
 
 \item{digits}{Number of digits to round to. Dafault: 3}
-
-\item{details}{logical. If \code{TRUE} covariate balance for the models
-used to create the inputs into the weights used in effect estimation
-is checked. If \code{FALSE} the additional balance is not checked.}
-
-\item{plot}{logical. If \code{TRUE}, plots of the balance for all covariates
-are outputted for each type of effect (NIE0, NIE1, NDE0, NDE1, TE)
-for each stopping method. If \code{FALSE}, no plots are returned.}
 
 \item{...}{Additional arguments.}
 }
@@ -26,12 +18,12 @@ for each stopping method. If \code{FALSE}, no plots are returned.}
 exposure groups both before and after weighting}
 }
 \description{
-Compute the balance table for mediation object.
+Compute the balance table for mediation object
 }
 \examples{
 data("tMdat")
 
-## tMdat is small simulated data set included in twangMedRiation for 
+## tMdat is small simulated data set included in twangMediation for 
 ## demonstrating the functions. See ?tMdat for details
 
 fit.es.max <- wgtmed(M ~ w1 + w2 + w3,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dx.wts.mediation.R
 \name{dx.wts.mediation}
 \alias{dx.wts.mediation}
-\title{Compute diagnostics assessing covariates balance.}
+\title{Compute diagnostics assessing covariates balance}
 \usage{
 dx.wts.mediation(
   x,
@@ -35,7 +35,7 @@ specifies propensity score weights or propensity scores.
 Ignored if \code{x} is a ps object. Default: \code{TRUE}.}
 
 \item{sampw}{Optional sampling weights. If \code{x} is a \code{ps} object, then the
-sampling weights should have been passed to \link{ps} and
+sampling weights should have been passed to \link[twang]{ps} and
 not specified here. \code{dx.wts.mediation} will issue a warning if
 \code{x} is a ps object and \code{sampw} is also specified.}
 
